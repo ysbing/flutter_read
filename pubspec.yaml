@@ -1,0 +1,19 @@
+name: flutter_read
+description: Flutter小说阅读器
+version: 1.0.0
+homepage: https://github.com/ysbing/flutter_read
+
+environment:
+  sdk: '>=2.19.6 <3.0.0'
+  flutter: ">=2.5.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.0.2
+  synchronized: ^3.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
