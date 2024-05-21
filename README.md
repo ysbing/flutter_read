@@ -1,10 +1,10 @@
-Language: [English](https://github.com/ysbing/flutter_read/raw/master/README.md) | [中文简体](https://github.com/ysbing/flutter_read/raw/master/README_zh.md)
+Language: [English](https://github.com/ysbing/flutter_read/blob/main/README.md) | [中文简体](https://github.com/ysbing/flutter_read/blob/main/README_zh.md)
 
 # flutter_read
 
 Flutter Reader is a cross-platform reading application that provides users with a high-quality local novel reading experience.
 
-![Demo](https://github.com/ysbing/flutter_read/raw/master/demo.webp)
+![Demo](https://github.com/ysbing/flutter_read/raw/main/demo.webp)
 
 ## Features
 
