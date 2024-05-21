@@ -102,23 +102,27 @@ class ReadPagePosition extends ScrollPositionWithSingleContext
     return !hasPixels || !hasContentDimensions
         ? null
         : cachedPage ??
-            getPageFromPixels(
-                clampDouble(pixels, minScrollExtent, maxScrollExtent),
+            getPageFromPixels(pixels.clamp(minScrollExtent, maxScrollExtent),
                 viewportDimension);
   }
 
   @override
   void saveScrollOffset() {
-    PageStorage.maybeOf(context.storageContext)?.writeState(
-        context.storageContext,
+    final PageStorage? widget =
+        context.storageContext.findAncestorWidgetOfExactType<PageStorage>();
+    final PageStorageBucket? bucket = widget?.bucket;
+    bucket?.writeState(context.storageContext,
         cachedPage ?? getPageFromPixels(pixels, viewportDimension));
   }
 
   @override
   void restoreScrollOffset() {
     if (!hasPixels) {
-      final double? value = PageStorage.maybeOf(context.storageContext)
-          ?.readState(context.storageContext) as double?;
+      final PageStorage? widget =
+          context.storageContext.findAncestorWidgetOfExactType<PageStorage>();
+      final PageStorageBucket? bucket = widget?.bucket;
+      final double? value =
+          bucket?.readState(context.storageContext) as double?;
       if (value != null) {
         _pageToUseOnStartup = value;
       }

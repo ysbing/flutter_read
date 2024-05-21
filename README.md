@@ -1,46 +1,48 @@
+Language: [English](https://github.com/ysbing/flutter_read/raw/master/README.md) | [中文简体](https://github.com/ysbing/flutter_read/raw/master/README_zh.md)
+
 # flutter_read
 
-Flutter小说阅读器是一款跨平台的阅读应用，为用户提供优质的本地小说阅读体验。
+Flutter Reader is a cross-platform reading application that provides users with a high-quality local novel reading experience.
 
-![演示](https://github.com/ysbing/flutter_read/raw/main/demo.webp)
+![Demo](https://github.com/ysbing/flutter_read/raw/master/demo.webp)
 
-## 功能特点
+## Features
 
-- 支持本地小说的阅读
-- 实现了流畅的覆盖式滑动方式
-- 提供多样化的文字样式设置，包括颜色、大小和字体
-- 可自由调整行间距和字间距，个性化阅读体验
-- 允许设置简介页和章尾页，包括设置章节评价和互动页等功能
+- Supports reading local novels
+- Implements smooth scrolling with coverage
+- Provides diverse text style settings, including color, size, and font
+- Allows free adjustment of line spacing and letter spacing for personalized reading experience
+- Enables setting introduction pages and chapter end pages, including features like chapter ratings and interactive pages
 
-## 平台支持
+## Platform Support
 
 | Android | iOS | MacOS | Windows | Linux | Web |
 | :-----: | :-: | :---: | :-: | :---: | :-----: |
 |   ✅    | ✅  |  ✅   | ✅  |  ✅   |   ✅    |
 
 
-## 安装
+## Installation
 
-1. 按照安装说明在你的Flutter项目的`pubspec.yaml`文件中添加此包
+1. Add this package to your Flutter project's `pubspec.yaml` file according to the installation instructions
    ```yaml
    dependencies:
-      flutter_read: "^1.0.0"
+      flutter_read: "^1.0.1"
    ```
 
-2. 导入所需的库
+2. Import the necessary libraries
 
    ```dart
    import 'package:flutter_read/flutter_read.dart';
    ```
 
-## 使用
+## Usage
 
-1. 声明小说控制器变量：
+1. Declare a novel controller variable:
    ```dart
    final ReadController readController = ReadController.create();
    ```
 
-2. 将小说控件添加到界面上：
+2. Add the novel widget to the interface:
    ```dart
    @override            
    Widget build(BuildContext context) {
@@ -50,21 +52,21 @@ Flutter小说阅读器是一款跨平台的阅读应用，为用户提供优质�
    }
    ```
 
-3. 打开小说：
+3. Open the novel:
    ```dart
    final ByteData byteData = await rootBundle.load("assets/斗罗大陆.txt");
    BookSource source = ByteDataSource(byteData, "《斗罗大陆》", isSplit: true);
    int state = await readController.startReadBook(source);
    ```
 
-4. 监听小说阅读进度
+4. Listen to the novel reading progress:
    ```dart
    StreamSubscription subscription =
    readController.onPageIndexChanged.listen((progress) {
-     // 处理页面索引变化的逻辑
+     // Handle logic for page index changes
    });
    
-   // 页面退出时取消订阅
+   // Unsubscribe when the page exits
    @override
    void dispose() {
      subscription.cancel();
@@ -72,6 +74,6 @@ Flutter小说阅读器是一款跨平台的阅读应用，为用户提供优质�
    }
    ```
 
-## 许可证
+## License
 
-本项目采用 [LGPLv3](https://opensource.org/licenses/LGPL-3.0) 许可证发布。
+This project is released under the [LGPLv3](https://opensource.org/licenses/LGPL-3.0) license.
