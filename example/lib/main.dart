@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_read/flutter_read.dart';
+
+import 'data.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,8 +31,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> start() async {
     DateTime now = DateTime.now();
-    final ByteData byteData = await rootBundle.load("assets/斗罗大陆.txt");
-    BookSource source = ByteDataSource(byteData, "《斗罗大陆》", isSplit: true);
+    BookSource source = StringSource(bookData, "《斗罗大陆》", isSplit: true);
     int state = await bookController.startReadBook(source);
     Duration duration = DateTime.now().difference(now);
     debugPrint("wwww,加载小说耗时,$duration,$state");

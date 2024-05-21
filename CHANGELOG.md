@@ -1,3 +1,3 @@
-## 0.0.1
+## 1.0.1
 
-* TODO: Describe initial release.
+* Modify the Flutter version range to be >=2.17.0 <3.0.0.

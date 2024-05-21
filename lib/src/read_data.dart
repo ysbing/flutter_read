@@ -95,8 +95,10 @@ class ChapterData {
   int chapterIndex;
   int sentenceIndex;
   int wordIndex;
+
   // 简介页
   bool summary;
+
   // 尾页，可用于章评，互动页
   bool colophon;
 
@@ -200,6 +202,27 @@ class ByteDataSource extends BookSource {
   Future<Map<String, List<BookSentence>>> getData() {
     Uint8List bytes = source.buffer.asUint8List();
     StreamController<List<int>> controller = StreamController<List<int>>();
+    controller.add(bytes);
+    controller.close();
+    Stream<List<int>> stream = controller.stream;
+    return _read(stream, title, isSplit);
+  }
+
+  @override
+  String getTitle() => title;
+}
+
+class StringSource extends BookSource {
+  final String source;
+  final String title;
+  final bool isSplit;
+
+  StringSource(this.source, this.title, {this.isSplit = false});
+
+  @override
+  Future<Map<String, List<BookSentence>>> getData() {
+    StreamController<List<int>> controller = StreamController<List<int>>();
+    List<int> bytes = utf8.encode(source);
     controller.add(bytes);
     controller.close();
     Stream<List<int>> stream = controller.stream;
