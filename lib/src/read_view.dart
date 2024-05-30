@@ -142,6 +142,8 @@ class _ReadViewState extends State<ReadView> {
           onEdgeCallback: widget.readController.onEdgeCallback_,
           onScrollCallback: widget.onScroll,
           onPageIndexChanged: _onPageIndexChanged,
+          onVerticalDrag:
+              widget.readController.enableVerticalDrag ? widget.onMenu : null,
         );
         Offset tapPosition = Offset.zero;
         double tapWidth = size.width / 3;
@@ -161,13 +163,6 @@ class _ReadViewState extends State<ReadView> {
           onTapDown: (details) {
             tapPosition = details.globalPosition;
           },
-          onVerticalDragEnd: widget.readController.enableVerticalDrag
-              ? (details) {
-                  if ((details.primaryVelocity ?? 0) < 0) {
-                    widget.onMenu?.call();
-                  }
-                }
-              : null,
           child: current,
         );
         return current;
@@ -243,8 +238,8 @@ class _ReadViewState extends State<ReadView> {
       animPreviousPageIndex = pageController.page!.round() - 1;
       await pageController.animateToPage(
         animPreviousPageIndex!,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.linear,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutCubic,
       );
       if (pageController.page!.round() == animPreviousPageIndex) {
         animPreviousPageIndex = null;
@@ -272,8 +267,8 @@ class _ReadViewState extends State<ReadView> {
       animNextPageIndex = pageController.page!.round() + 1;
       await pageController.animateToPage(
         animNextPageIndex!,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.linear,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutCubic,
       );
       if (pageController.page!.round() == animNextPageIndex) {
         animNextPageIndex = null;

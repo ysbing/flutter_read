@@ -21,6 +21,7 @@ class _MyAppState extends State<MyApp> {
     loadingWidget: const Center(
       child: CircularProgressIndicator(),
     ),
+    enableVerticalDrag: true
   );
 
   @override
@@ -45,6 +46,9 @@ class _MyAppState extends State<MyApp> {
         body: SafeArea(
           child: ReadView(
             readController: bookController,
+            onMenu: (){
+              print("wwww,拉起菜单");
+            },
           ),
         ),
       ),

@@ -2,7 +2,7 @@ Language: [English](https://github.com/ysbing/flutter_read/blob/main/README.md) 
 
 # flutter_read
 
-Flutter Reader is a cross-platform reading application that provides users with a high-quality local novel reading experience.
+Flutter Novel Reader is a multi-platform reading app offering smooth scrolling, diverse text styles, and personalized settings. It supports chapter evaluation and interaction features, easy installation and usage, real-time reading progress monitoring, and is released under the LGPLv3 license.
 
 ![Demo](https://github.com/ysbing/flutter_read/raw/main/demo.webp)
 
@@ -26,7 +26,7 @@ Flutter Reader is a cross-platform reading application that provides users with 
 1. Add this package to your Flutter project's `pubspec.yaml` file according to the installation instructions
    ```yaml
    dependencies:
-      flutter_read: "^1.0.1"
+      flutter_read: "^1.0.2"
    ```
 
 2. Import the necessary libraries

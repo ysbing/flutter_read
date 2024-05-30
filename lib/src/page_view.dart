@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/rendering.dart';
 
-import 'read_controller.dart';
 import 'page_position.dart';
+import 'read_controller.dart';
 import 'scroll_controller.dart';
 
 class ReadPageView extends StatefulWidget {
@@ -15,6 +15,7 @@ class ReadPageView extends StatefulWidget {
   final EdgeCallback? onEdgeCallback;
   final VoidCallback? onScrollCallback;
   final IndexCallback? onPageIndexChanged;
+  final GestureTapCallback? onVerticalDrag;
 
   const ReadPageView({
     super.key,
@@ -23,6 +24,7 @@ class ReadPageView extends StatefulWidget {
     this.onEdgeCallback,
     this.onScrollCallback,
     this.onPageIndexChanged,
+    this.onVerticalDrag,
   });
 
   @override
@@ -41,6 +43,8 @@ class _ReadPageViewState extends State<ReadPageView>
 
   ReadPagePosition get position => _position!;
   ReadPagePosition? _position;
+  bool _isVerticalDrag = false;
+  bool _firstVerticalDrag = true;
 
   @override
   void didChangeDependencies() {
@@ -120,6 +124,7 @@ class _ReadPageViewState extends State<ReadPageView>
 
   Drag? _drag;
   ScrollHoldController? _hold;
+  Offset _startPosition = Offset.zero;
 
   void _handleDragDown(DragDownDetails details) {
     if (!(widget.pageController?.isSafeScrolling() ?? false)) {
@@ -128,6 +133,9 @@ class _ReadPageViewState extends State<ReadPageView>
   }
 
   void _handleDragStart(DragStartDetails details) {
+    _isVerticalDrag = false;
+    _firstVerticalDrag = true;
+    _startPosition = details.globalPosition;
     if (!(widget.pageController?.isSafeScrolling() ?? false)) {
       _drag = position.drag(details, _disposeDrag);
     }
@@ -136,14 +144,29 @@ class _ReadPageViewState extends State<ReadPageView>
   void _handleDragUpdate(DragUpdateDetails details) {
     // _drag might be null if the drag activity ended and called _disposeDrag.
     assert(_hold == null || _drag == null);
-    _drag?.update(details);
+    if (_firstVerticalDrag && widget.onVerticalDrag != null) {
+      _firstVerticalDrag = false;
+      Offset diff = details.globalPosition - _startPosition;
+      final dx = diff.dx;
+      final dy = diff.dy;
+      if (dy < 0 && dy.abs() >= dx.abs() * 2.5) {
+        _isVerticalDrag = true;
+      }
+    }
+    if (!_isVerticalDrag) {
+      _drag?.update(details);
+    }
   }
 
   void _handleDragEnd(DragEndDetails details) {
-    // _drag might be null if the drag activity ended and called _disposeDrag.
-    assert(_hold == null || _drag == null);
-    _drag?.end(details);
-    assert(_drag == null);
+    if (_isVerticalDrag) {
+      widget.onVerticalDrag?.call();
+    } else {
+      // _drag might be null if the drag activity ended and called _disposeDrag.
+      assert(_hold == null || _drag == null);
+      _drag?.end(details);
+      assert(_drag == null);
+    }
   }
 
   void _handleDragCancel() {
@@ -241,9 +264,9 @@ class _AvoidExcessiveInertiaPageScrollPhysics extends PageScrollPhysics {
 
   static final SpringDescription _kDefaultSpring =
       SpringDescription.withDampingRatio(
-    mass: 0.5,
-    stiffness: 300.0,
-    ratio: 1.1,
+    mass: 1,
+    stiffness: 60.0,
+    ratio: 1.3,
   );
 
   @override
