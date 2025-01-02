@@ -6,6 +6,7 @@ import 'package:flutter/physics.dart';
 import 'package:flutter/rendering.dart';
 
 import 'page_position.dart';
+import 'read_compat.dart';
 import 'read_controller.dart';
 import 'scroll_controller.dart';
 
@@ -48,6 +49,12 @@ class _ReadPageViewState extends State<ReadPageView>
 
   @override
   void didChangeDependencies() {
+    if (ReadCompat().isDartVersionAtLeast300()) {
+      dynamic mediaQueryData = MediaQuery.maybeOf(context);
+      _devicePixelRatio = mediaQueryData?.devicePixelRatio ?? 1;
+    } else {
+      _devicePixelRatio = 1;
+    }
     _updatePosition();
     super.didChangeDependencies();
   }
@@ -234,6 +241,9 @@ class _ReadPageViewState extends State<ReadPageView>
 
   @override
   TickerProvider get vsync => this;
+
+  double get devicePixelRatio => _devicePixelRatio;
+  late double _devicePixelRatio;
 }
 
 // 单指滑动

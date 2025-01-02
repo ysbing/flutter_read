@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
+import 'read_compat.dart';
 import 'read_controller.dart';
 
 class ReadPagePosition extends ScrollPositionWithSingleContext
@@ -199,25 +201,42 @@ class ReadPagePosition extends ScrollPositionWithSingleContext
   }
 
   @override
-  PageMetrics copyWith({
-    double? minScrollExtent,
-    double? maxScrollExtent,
-    double? pixels,
-    double? viewportDimension,
-    AxisDirection? axisDirection,
-    double? viewportFraction,
-  }) {
-    return PageMetrics(
-      minScrollExtent: minScrollExtent ??
-          (hasContentDimensions ? this.minScrollExtent : null),
-      maxScrollExtent: maxScrollExtent ??
-          (hasContentDimensions ? this.maxScrollExtent : null),
-      pixels: pixels ?? (hasPixels ? this.pixels : null),
-      viewportDimension: viewportDimension ??
-          (hasViewportDimension ? this.viewportDimension : null),
-      axisDirection: axisDirection ?? this.axisDirection,
-      viewportFraction: viewportFraction ?? this.viewportFraction,
-    );
+  PageMetrics copyWith(
+      {double? minScrollExtent,
+      double? maxScrollExtent,
+      double? pixels,
+      double? viewportDimension,
+      AxisDirection? axisDirection,
+      double? viewportFraction,
+      double? devicePixelRatio}) {
+    Function pageMetrics = PageMetrics.new;
+    if (ReadCompat().isDartVersionAtLeast300()) {
+      dynamic it = this;
+      return pageMetrics(
+        minScrollExtent: minScrollExtent ??
+            (hasContentDimensions ? this.minScrollExtent : null),
+        maxScrollExtent: maxScrollExtent ??
+            (hasContentDimensions ? this.maxScrollExtent : null),
+        pixels: pixels ?? (hasPixels ? this.pixels : null),
+        viewportDimension: viewportDimension ??
+            (hasViewportDimension ? this.viewportDimension : null),
+        axisDirection: axisDirection ?? this.axisDirection,
+        viewportFraction: viewportFraction ?? this.viewportFraction,
+        devicePixelRatio: devicePixelRatio ?? it.devicePixelRatio,
+      );
+    } else {
+      return pageMetrics(
+        minScrollExtent: minScrollExtent ??
+            (hasContentDimensions ? this.minScrollExtent : null),
+        maxScrollExtent: maxScrollExtent ??
+            (hasContentDimensions ? this.maxScrollExtent : null),
+        pixels: pixels ?? (hasPixels ? this.pixels : null),
+        viewportDimension: viewportDimension ??
+            (hasViewportDimension ? this.viewportDimension : null),
+        axisDirection: axisDirection ?? this.axisDirection,
+        viewportFraction: viewportFraction ?? this.viewportFraction,
+      );
+    }
   }
 
   // 处理滑动边缘

@@ -26,7 +26,7 @@ Flutter Novel Reader is a multi-platform reading app offering smooth scrolling, 
 1. Add this package to your Flutter project's `pubspec.yaml` file according to the installation instructions
    ```yaml
    dependencies:
-      flutter_read: "^1.0.2"
+      flutter_read: "^1.0.3"
    ```
 
 2. Import the necessary libraries
