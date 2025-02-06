@@ -23,6 +23,7 @@ class ReadCompat {
       final minor = int.tryParse(match.group(2) ?? '0') ?? 0;
       final patch = int.tryParse(match.group(3) ?? '0') ?? 0;
 
+      // Compare version numbers
       // 比较版本号
       if (major > 3 ||
           (major == 3 && (minor > 0 || (minor == 0 && patch >= 0)))) {

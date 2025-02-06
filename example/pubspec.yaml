@@ -20,3 +20,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    - family: 楷体
+      fonts:
+        - asset: fonts/楷体字体.ttf

@@ -103,7 +103,9 @@ class _ReadPageViewState extends State<ReadPageView>
                 widget.pageController!.initialPage;
             widget.onPageIndexChanged?.call(currentIndex);
           } else if (notification is ScrollStartNotification) {
-            widget.onScrollCallback?.call();
+            if (notification.dragDetails != null) {
+              widget.onScrollCallback?.call();
+            }
           }
           return false;
         },
@@ -128,7 +130,7 @@ class _ReadPageViewState extends State<ReadPageView>
   }
 
   // TOUCH HANDLERS
-
+  // 触摸事件处理
   Drag? _drag;
   ScrollHoldController? _hold;
   Offset _startPosition = Offset.zero;
@@ -150,6 +152,7 @@ class _ReadPageViewState extends State<ReadPageView>
 
   void _handleDragUpdate(DragUpdateDetails details) {
     // _drag might be null if the drag activity ended and called _disposeDrag.
+    // 如果拖动活动结束并调用 _disposeDrag，则 _drag 可能为 null。
     assert(_hold == null || _drag == null);
     if (_firstVerticalDrag && widget.onVerticalDrag != null) {
       _firstVerticalDrag = false;
@@ -170,6 +173,7 @@ class _ReadPageViewState extends State<ReadPageView>
       widget.onVerticalDrag?.call();
     } else {
       // _drag might be null if the drag activity ended and called _disposeDrag.
+      // 如果拖动活动结束并调用 _disposeDrag，则 _drag 可能为 null。
       assert(_hold == null || _drag == null);
       _drag?.end(details);
       assert(_drag == null);
@@ -179,6 +183,8 @@ class _ReadPageViewState extends State<ReadPageView>
   void _handleDragCancel() {
     // _hold might be null if the drag started.
     // _drag might be null if the drag activity ended and called _disposeDrag.
+    // 如果拖动开始，则 _hold 可能为 null。
+    // 如果拖动活动结束并调用 _disposeDrag，则 _drag 可能为 null。
     assert(_hold == null || _drag == null);
     _hold?.cancel();
     _drag?.cancel();
@@ -246,6 +252,7 @@ class _ReadPageViewState extends State<ReadPageView>
   late double _devicePixelRatio;
 }
 
+// Single finger swipe
 // 单指滑动
 class _SingleTouchHorizontalDragGestureRecognizer
     extends HorizontalDragGestureRecognizer {
@@ -268,6 +275,7 @@ class _SingleTouchHorizontalDragGestureRecognizer
   }
 }
 
+// Avoid excessive inertia
 // 避免惯性过度
 class _AvoidExcessiveInertiaPageScrollPhysics extends PageScrollPhysics {
   const _AvoidExcessiveInertiaPageScrollPhysics({super.parent});
@@ -385,6 +393,7 @@ class _CriticalSolution {
   }
 }
 
+// Overlay swipe
 // 覆盖滑动
 class _FillViewportRenderObjectWidget extends SliverMultiBoxAdaptorWidget {
   const _FillViewportRenderObjectWidget({

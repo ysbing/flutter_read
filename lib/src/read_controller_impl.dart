@@ -10,40 +10,50 @@ import 'read_controller.dart';
 import 'read_data.dart';
 
 class ReadControllerImpl implements ReadController {
-  // 关联上阅读器
+  // English: Associates with the reader
+  // 中文: 关联上阅读器
   final ValueNotifier<bool> isAttach = ValueNotifier(false);
 
-  // 当前进度
+  // English: Current progress
+  // 中文: 当前进度
   BookProgress currentProgress_ = BookProgress.zero;
 
-  // 禁止左滑
+  // English: Disable left swipe
+  // 中文: 禁止左滑
   final ValueNotifier<bool> disableLeft = ValueNotifier(true);
 
-  // 禁止右滑
+  // English: Disable right swipe
+  // 中文: 禁止右滑
   final ValueNotifier<bool> disableRight = ValueNotifier(true);
 
-  // 上划调用菜单
+  // English: Call menu on upward swipe
+  // 中文: 上划调用菜单
   final bool enableVerticalDrag;
 
   final Widget? loadingWidget;
 
-  // 简介页
+  BookSource? bookSource_;
+
+  // English: Summary page
+  // 中文: 简介页
   Widget? summaryWidget;
 
-  // 绘制样式
+  // English: Rendering style
+  // 中文: 绘制样式
   ReadStyle readStyle_ = ReadStyle(
     textStyle: const TextStyle(
         color: Color(0xFF212832), fontSize: 20, fontWeight: FontWeight.w400),
     titleTextStyle: const TextStyle(
         color: Color(0xFF212832), fontSize: 26, fontWeight: FontWeight.w600),
-    bgColor: const Color(0xFFE2E8DC),
+    bgColor: const Color(0xFFF5F5DC),
     sentenceSpacing: 16,
     lineSpacing: 8,
     wordSpacing: 2,
     padding: const EdgeInsets.all(20),
   );
 
-  // 页面下标改变通知
+  // English: Page index change notification
+  // 中文: 页面下标改变通知
   final StreamController<BookProgress> onPageIndexChangedController =
       StreamController<BookProgress>.broadcast();
 
@@ -51,49 +61,62 @@ class ReadControllerImpl implements ReadController {
   Stream<BookProgress> get onPageIndexChanged =>
       onPageIndexChangedController.stream;
 
-  // 滑动到边缘通知,true是左边缘，false是右边缘
+  // English: Notification when swiping to the edge, true indicates the left edge, false indicates the right edge
+  // 中文: 滑动到边缘通知,true是左边缘，false是右边缘
   EdgeCallback? onEdgeCallback_;
 
-  // 页面加载时的回调，用来插入额外的页面
+  // English: Callback when loading the page, used to insert additional pages
+  // 中文: 页面加载时的回调，用来插入额外的页面
   ReadDataListCallback? onBookDataListCallback_;
 
   //  ---------- inner start -------------
-  // 内部变量，外部勿用
+  // English: Internal variables, for internal use only
+  // 中文: 内部变量，外部勿用
   static const int initialPage = 100000000;
   final Map<int, List<PaintData>> bookPageList = SplayTreeMap();
   final Map<int, BookSource> _chapterSourceList = SplayTreeMap();
   final Map<int, List<BookSentence>> chapterSentences = SplayTreeMap();
 
-  // 书本加载完成
+  // English: Indicates if the book has been fully loaded
+  // 中文: 书本加载完成
   bool _isLoadCompleter = false;
 
-  // 阅读器容器大小
+  // English: Size of the reader container
+  // 中文: 阅读器容器大小
   Size contentSize = Size.zero;
 
-  // 当前页面偏移量
+  // English: Current page offset
+  // 中文: 当前页面偏移量
   int firstIndex = initialPage;
 
-  // 数据锁
+  // English: Data lock
+  // 中文: 数据锁
   final Lock _beforeChapterLock = Lock();
   final Lock _afterChapterLock = Lock();
 
-  // 文字大小
+  // English: Text size
+  // 中文: 文字大小
   Size zhWordSize = Size.zero;
   Size zhTitleWordSize = Size.zero;
 
-  // 跳转到指定页
+  // English: Jump to the specified page
+  // 中文: 跳转到指定页
   IndexCallback? jumpToPageCallback;
 
-  // 刷新页面
+  // English: Refresh the page
+  // 中文: 刷新页面
   VoidCallback? refreshCallback;
 
-  // 重置页面
+  // English: Reset the page
+  // 中文: 重置页面
   VoidCallback? resetCallback;
 
-  // 当前页面
+  // English: Current page
+  // 中文: 当前页面
   int Function()? currentPageIndexCallback;
 
-  // 页面跳转
+  // English: Page scrolling
+  // 中文: 页面跳转
   IndexCallback? scrollToPageCallback;
 
   //  ---------- inner end -------------
@@ -148,7 +171,8 @@ class ReadControllerImpl implements ReadController {
       i++;
     }
     chapter ??= ChapterData();
-    return _startRead(source, chapter);
+    return _startRead(
+        _chapterSourceList[chapter.chapterIndex] ?? source, chapter);
   }
 
   @override
@@ -182,6 +206,7 @@ class ReadControllerImpl implements ReadController {
   }
 
   Future<int> _startRead(BookSource source, ChapterData chapter) async {
+    bookSource_ = source;
     int chapterIndex = chapter.chapterIndex;
     List<PaintData> bookDataList = List.empty(growable: true);
     bookPageList[chapterIndex] = bookDataList;
@@ -271,6 +296,9 @@ class ReadControllerImpl implements ReadController {
   }
 
   @override
+  BookSource? get currentBookSource => bookSource_;
+
+  @override
   BookProgress get currentProgress => currentProgress_;
 
   @override
@@ -305,7 +333,9 @@ class ReadControllerImpl implements ReadController {
     int insertIndex = findChapterInsertIndex(chapterIndex) + firstIndex;
     int pageIndex = findChapterPageIndex(chapter, bookList);
     int summaryIndex = 0;
-    if (bookList.isNotEmpty && bookList.first.widget == summaryWidget) {
+    if (bookList.isNotEmpty &&
+        summaryWidget != null &&
+        bookList.first.widget == summaryWidget) {
       summaryIndex++;
     }
     int interactionIndex = 0;
@@ -342,6 +372,7 @@ class ReadControllerImpl implements ReadController {
     }
   }
 
+  // Add summary page widget
   // 添加简介页Widget
   @override
   void setSummaryWidget(Widget widget) {
@@ -349,7 +380,13 @@ class ReadControllerImpl implements ReadController {
   }
 
   @override
-  BookSource? getSourceFromIndex(int chapterIndex) => _chapterSourceList[chapterIndex];
+  int getChapterNum() {
+    return _chapterSourceList.length;
+  }
+
+  @override
+  BookSource? getSourceFromIndex(int chapterIndex) =>
+      _chapterSourceList[chapterIndex];
 
   @override
   List<BookSentence>? getSentenceFromIndex(int chapterIndex) =>

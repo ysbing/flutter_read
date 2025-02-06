@@ -1,4 +1,8 @@
-## [1.0.3] - 2025.1.2
+## [1.0.4] - 2025.2.6
+
+* Improve example projects and annotations.
+
+* ## [1.0.3] - 2025.1.2
 
 * Compatible with and fully supports Flutter 3.x
 

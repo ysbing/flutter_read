@@ -125,6 +125,7 @@ Future<ui.Picture> drawTextOnCanvas(
           line.isTitle ? readStyle.titleTextStyle : readStyle.textStyle);
       tp.paint(canvas,
           Offset(x, y + (controller.zhWordSize.height - tp.height) / 2));
+      // Update X coordinate for the next character
       // 更新X坐标，用于下一个字符
       x += tp.width + wordSpacing;
     }
@@ -138,6 +139,7 @@ Future<ui.Picture> drawTextOnCanvas(
   return recorder.endRecording();
 }
 
+/// Get page content after this point
 /// 在这之后获取页内容
 BookPage _getPageContentAfter(
     ReadControllerImpl controller,
@@ -213,6 +215,7 @@ BookPage _getPageContentAfter(
   return page;
 }
 
+/// Get page content before this point
 /// 在这之前获取页内容
 BookPage _getPageContentBefore(
     ReadControllerImpl controller,
@@ -226,6 +229,7 @@ BookPage _getPageContentBefore(
   BookPage page = BookPage();
   int currentIndex = sentenceIndex;
   int startIndex = wordIndex;
+  // Move paragraph to the left if the previous page starts at the beginning of a paragraph
   // 说明上页开始是段落开始位置，段落左移
   if (wordIndex == 0) {
     currentIndex--;
@@ -357,6 +361,7 @@ BookPage _getPageContentBefore(
   return page;
 }
 
+/// Get line content after this point
 /// 在这之后获取行内容
 List<BookLine> _getLineContentAfter(ReadControllerImpl controller,
     BookSentence sentence, int index, bool isTitle) {
@@ -373,7 +378,8 @@ List<BookLine> _getLineContentAfter(ReadControllerImpl controller,
     lastLine = BookLine(sentence, startIndex);
     lines.add(lastLine);
     List<int> strBreak = _breakText(controller, str, isTitle);
-    //不满一行
+    // Not enough for one line
+    // 不满一行
     if (strBreak[1] != 1) {
       break;
     }
@@ -384,6 +390,7 @@ List<BookLine> _getLineContentAfter(ReadControllerImpl controller,
   return lines;
 }
 
+/// Get line content before this point
 /// 在这之前获取行内容
 List<BookLine> _getLineContentBefore(ReadControllerImpl controller,
     BookSentence sentence, int index, bool isTitle) {
@@ -401,7 +408,8 @@ List<BookLine> _getLineContentBefore(ReadControllerImpl controller,
     lastLine = BookLine(sentence, startIndex);
     lines.add(lastLine);
     List<int> strBreak = _breakText(controller, str, isTitle);
-    //不满一行
+    // Not enough for one line
+    // 不满一行
     if (strBreak[1] != 1) {
       List<BookWord> fixStr = sentence.words.sublist(startIndex);
       List<int> fixStrBreak = _breakText(controller, fixStr, isTitle);
@@ -465,12 +473,14 @@ List<int> _breakText(
   return strBreak;
 }
 
+// Check if it's a half-width character
 // 是否半角字符
 bool _isHalf(String character) {
   int code = character.codeUnitAt(0);
   return code >= 0x0020 && code <= 0x007E || code == 0x201C || code == 0x201D;
 }
 
+// Check if it's a punctuation mark
 // 是否标点符号
 bool _isPunctuation(String character) {
   int code = character.codeUnitAt(0);

@@ -41,7 +41,6 @@ class _ReadViewState extends State<ReadView> {
   int? animPreviousPageIndex;
   int? animNextPageIndex;
   StreamSubscription? _onPageIndexChangedSubscription;
-  bool _isInitPageIndexChanged = true;
   Timer? _refreshTimer;
 
   @override
@@ -53,11 +52,8 @@ class _ReadViewState extends State<ReadView> {
       return pageController.initialPage;
     };
     widget.readController.refreshCallback = () {
-      if (_isInitPageIndexChanged) {
-        _isInitPageIndexChanged = false;
-        _onPageIndexChanged(
-            widget.readController.currentPageIndexCallback!.call());
-      }
+      _onPageIndexChanged(
+          widget.readController.currentPageIndexCallback!.call());
       setState(() {});
     };
     widget.readController.resetCallback = () {
@@ -235,6 +231,7 @@ class _ReadViewState extends State<ReadView> {
       return;
     }
     if (animPreviousPageIndex == null) {
+      widget.onScroll?.call();
       animPreviousPageIndex = pageController.page!.round() - 1;
       await pageController.animateToPage(
         animPreviousPageIndex!,
@@ -264,6 +261,7 @@ class _ReadViewState extends State<ReadView> {
       return;
     }
     if (animNextPageIndex == null) {
+      widget.onScroll?.call();
       animNextPageIndex = pageController.page!.round() + 1;
       await pageController.animateToPage(
         animNextPageIndex!,
