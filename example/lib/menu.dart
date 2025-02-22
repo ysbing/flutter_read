@@ -122,7 +122,7 @@ class _BookMenuState extends State<BookMenu> {
                 height: 60,
                 child: Row(
                   children: [
-                    _item("目录", "", () {
+                    _item("Contents", "", () {
                       if (_showSettingFlag) {
                         _closeSetting();
                       }
@@ -136,7 +136,7 @@ class _BookMenuState extends State<BookMenu> {
                       width: 1,
                       color: Colors.amberAccent,
                     ),
-                    _item("设置", "", () {
+                    _item("Settings", "", () {
                       if (_showDirectoryFlag) {
                         _closeDirectory();
                       }

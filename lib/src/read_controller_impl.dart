@@ -30,6 +30,10 @@ class ReadControllerImpl implements ReadController {
   // 中文: 上划调用菜单
   final bool enableVerticalDrag;
 
+  // English: Tap to page
+  // 中文: 点击翻页
+  final bool enableTapPage;
+
   final Widget? loadingWidget;
 
   BookSource? bookSource_;
@@ -123,6 +127,7 @@ class ReadControllerImpl implements ReadController {
 
   ReadControllerImpl({
     this.enableVerticalDrag = false,
+    this.enableTapPage = true,
     this.onEdgeCallback_,
     this.loadingWidget,
     this.summaryWidget,

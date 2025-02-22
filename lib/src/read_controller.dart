@@ -10,6 +10,7 @@ abstract class ReadController {
 
   factory ReadController.create({
     bool enableVerticalDrag = false,
+    bool enableTapPage = true,
     Widget? loadingWidget,
     Widget? summaryWidget,
     ReadStyle? readStyle,
@@ -17,6 +18,7 @@ abstract class ReadController {
   }) {
     return ReadControllerImpl(
       enableVerticalDrag: enableVerticalDrag,
+      enableTapPage: enableTapPage,
       loadingWidget: loadingWidget,
       summaryWidget: summaryWidget,
       readStyle: readStyle,

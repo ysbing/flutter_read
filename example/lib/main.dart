@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_read/flutter_read.dart';
 
-import 'data.dart';
 import 'menu.dart';
 
 void main() {
@@ -19,10 +19,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final ReadController bookController = ReadController.create(
-      loadingWidget: const Center(
-        child: CircularProgressIndicator(),
-      ),
-      enableVerticalDrag: true);
+    loadingWidget: const Center(
+      child: CircularProgressIndicator(),
+    ),
+    enableVerticalDrag: true,
+    enableTapPage: true,
+  );
   PersistentBottomSheetController? _menuController;
 
   @override
@@ -33,7 +35,10 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> start() async {
     DateTime now = DateTime.now();
-    BookSource source = StringSource(bookData, "《斗罗大陆》", isSplit: true);
+    BookSource source = ByteDataSource(
+        await rootBundle.load("assets/books/Phineas Redux.txt"),
+        "Phineas Redux",
+        isSplit: true);
     int state = await bookController.startReadBook(source);
     Duration duration = DateTime.now().difference(now);
     debugPrint("wwww,loading time, $duration, $state");

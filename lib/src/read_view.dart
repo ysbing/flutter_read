@@ -141,26 +141,28 @@ class _ReadViewState extends State<ReadView> {
           onVerticalDrag:
               widget.readController.enableVerticalDrag ? widget.onMenu : null,
         );
-        Offset tapPosition = Offset.zero;
-        double tapWidth = size.width / 3;
-        Rect leftTap = Rect.fromLTWH(0, 0, tapWidth, size.height);
-        Rect midTap = Rect.fromLTWH(tapWidth, 0, tapWidth, size.height);
-        Rect rightTap = Rect.fromLTWH(2 * tapWidth, 0, tapWidth, size.height);
-        current = GestureDetector(
-          onTap: () {
-            if (leftTap.contains(tapPosition)) {
-              _previousPage(true);
-            } else if (midTap.contains(tapPosition)) {
-              widget.onMenu?.call();
-            } else if (rightTap.contains(tapPosition)) {
-              _nextPage(true);
-            }
-          },
-          onTapDown: (details) {
-            tapPosition = details.globalPosition;
-          },
-          child: current,
-        );
+        if (widget.readController.enableTapPage) {
+          Offset tapPosition = Offset.zero;
+          double tapWidth = size.width / 3;
+          Rect leftTap = Rect.fromLTWH(0, 0, tapWidth, size.height);
+          Rect midTap = Rect.fromLTWH(tapWidth, 0, tapWidth, size.height);
+          Rect rightTap = Rect.fromLTWH(2 * tapWidth, 0, tapWidth, size.height);
+          current = GestureDetector(
+            onTap: () {
+              if (leftTap.contains(tapPosition)) {
+                _previousPage(true);
+              } else if (midTap.contains(tapPosition)) {
+                widget.onMenu?.call();
+              } else if (rightTap.contains(tapPosition)) {
+                _nextPage(true);
+              }
+            },
+            onTapDown: (details) {
+              tapPosition = details.globalPosition;
+            },
+            child: current,
+          );
+        }
         return current;
       },
     );

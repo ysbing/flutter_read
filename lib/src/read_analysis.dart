@@ -458,10 +458,27 @@ List<int> _breakText(
         controller.readStyle_.wordSpacing +
         double.minPositive;
     if (preWidth > lineWidth) {
-      if (i == text.length - 1 && _isPunctuation(word)) {
-        strBreak[0] = i - 1;
+      if (_isHalf(word)) {
+        int wordIndex = i - 1;
+        while (wordIndex >= 0) {
+          final previousWord = text[wordIndex--].char;
+          if (previousWord == " " ||
+              _isPunctuation(previousWord) ||
+              !_isHalf(previousWord)) {
+            break;
+          }
+        }
+        int backCount = i - wordIndex - 1;
+        if (text[i - backCount].char == " ") {
+          backCount--;
+        }
+        strBreak[0] = i - backCount;
       } else {
-        strBreak[0] = i;
+        if (_isPunctuation(word)) {
+          strBreak[0] = i - 1;
+        } else {
+          strBreak[0] = i;
+        }
       }
       strBreak[1] = 1;
       return strBreak;
@@ -483,13 +500,43 @@ bool _isHalf(String character) {
 // Check if it's a punctuation mark
 // 是否标点符号
 bool _isPunctuation(String character) {
-  int code = character.codeUnitAt(0);
-  return (code >= 0x21 && code <= 0x2F) ||
-      (code >= 0x3A && code <= 0x40) ||
-      (code >= 0x5B && code <= 0x60) ||
-      (code >= 0x7B && code <= 0x7E) ||
-      (code >= 0x2000 && code <= 0x206F) ||
-      (code >= 0x3000 && code <= 0x303F);
+  if (character.isEmpty) return false;
+  final int code = character.codeUnitAt(0);
+
+  // Basic ASCII punctuation (English punctuation)
+  // ASCII 基础标点（英文标点）
+  final bool isBasicPunctuation =
+      (code >= 0x21 && code <= 0x2F) || // !"#$%&'()*+,-./
+          (code >= 0x3A && code <= 0x40) || // :;<=>?@
+          (code >= 0x5B && code <= 0x60) || // [\]^_`
+          (code >= 0x7B && code <= 0x7E); // {|}~
+
+  // General Unicode punctuation (cross-language)
+  // Unicode 通用标点（跨语言）
+  final bool isGeneralPunctuation =
+      (code >= 0x2000 && code <= 0x206F) || // Includes ‹›«»–—… etc.
+          (code >= 0x3000 &&
+              code <= 0x303F); // CJK symbols/punctuation (。、！？《》etc.)
+
+  // Full-width punctuation (Chinese typography)
+  // 全角标点（中文排版）
+  final bool isFullWidthPunctuation =
+      (code >= 0xFF01 && code <= 0xFF0F) || // Full-width !, ，．／ etc.
+          (code >= 0xFF1A && code <= 0xFF20) || // Full-width :;<=>?@
+          (code >= 0xFF3B && code <= 0xFF40) || // Full-width [\]^_`
+          (code >= 0xFF5B && code <= 0xFF65); // Full-width {|}~・
+
+  // Special Chinese punctuation (e.g., middle dot)
+  // 特殊中文标点（如间隔号·）
+  final bool isChineseSpecific = code ==
+          0x00B7 || // Latin-1 Supplement: middle dot (·) used in names
+      code == 0x2027 || // Hyphenation point (‧)
+      code == 0x30FB; // Japanese middle dot (・) but may appear in Chinese texts
+
+  return isBasicPunctuation ||
+      isGeneralPunctuation ||
+      isFullWidthPunctuation ||
+      isChineseSpecific;
 }
 
 TextPainter _wordPainter(String word, TextStyle textStyle) {

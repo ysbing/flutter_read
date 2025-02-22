@@ -21,7 +21,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  assets:
+    - assets/books/
+    - assets/fonts/
+
   fonts:
     - family: 楷体
       fonts:
-        - asset: fonts/楷体字体.ttf
+        - asset: assets/fonts/楷体字体.ttf

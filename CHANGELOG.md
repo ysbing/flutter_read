@@ -1,3 +1,7 @@
+## [1.0.5] - 2025.2.22
+
+* Optimize the Parsing of English Novels.
+
 ## [1.0.4] - 2025.2.6
 
 * Improve example projects and annotations.

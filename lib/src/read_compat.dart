@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 class ReadCompat {
   static final ReadCompat _instance = ReadCompat._internal();
 
@@ -12,6 +14,9 @@ class ReadCompat {
   bool? _isDartVersionAtLeast300;
 
   bool isDartVersionAtLeast300() {
+    if (kIsWeb) {
+      return false;
+    }
     if (_isDartVersionAtLeast300 != null) {
       return _isDartVersionAtLeast300!;
     }
