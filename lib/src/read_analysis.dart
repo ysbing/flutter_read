@@ -472,7 +472,11 @@ List<int> _breakText(
         if (text[i - backCount].char == " ") {
           backCount--;
         }
-        strBreak[0] = i - backCount;
+        if (i > backCount) {
+          strBreak[0] = i - backCount;
+        } else {
+          strBreak[0] = i;
+        }
       } else {
         if (_isPunctuation(word)) {
           strBreak[0] = i - 1;
