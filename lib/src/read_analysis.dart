@@ -107,18 +107,33 @@ Future<ui.Picture> drawTextOnCanvas(
         readStyle.padding.right -
         wordWidth;
     if (line.endIndex != null) {
-      wordSpacing = words.length <= 1 ? 0 : (spacing / (words.length - 1));
+      if ((line.isTitle && readStyle.titleTextAlign == TextAlign.justify) ||
+          (!line.isTitle && readStyle.textAlign == TextAlign.justify)) {
+        wordSpacing = words.length <= 1 ? 0 : (spacing / (words.length - 1));
+      }
       if (line.startIndex == 0) {
         firstLineWordSpacing = wordSpacing;
       }
     } else {
-      wordSpacing = firstLineWordSpacing;
+      if ((line.isTitle && readStyle.titleTextAlign == TextAlign.justify) ||
+          (!line.isTitle && readStyle.textAlign == TextAlign.justify)) {
+        wordSpacing = firstLineWordSpacing;
+      }
     }
-    if (line.isTitle) {
+    if ((line.isTitle && readStyle.titleTextAlign == TextAlign.center) ||
+        (!line.isTitle && readStyle.textAlign == TextAlign.center)) {
       x = (controller.contentSize.width -
               wordWidth -
               wordSpacing * (words.length - 1)) /
           2;
+    } else if ((line.isTitle && readStyle.titleTextAlign == TextAlign.end) ||
+        (line.isTitle && readStyle.titleTextAlign == TextAlign.right) ||
+        (!line.isTitle && readStyle.textAlign == TextAlign.end) ||
+        (!line.isTitle && readStyle.textAlign == TextAlign.right)) {
+      x = controller.contentSize.width -
+          wordWidth -
+          wordSpacing * (words.length - 1) -
+          readStyle.padding.right;
     }
     for (final word in words) {
       TextPainter tp = _wordPainter(word.char,

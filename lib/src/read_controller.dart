@@ -101,6 +101,8 @@ typedef ReadItemBuilder = Widget Function(
 class ReadStyle {
   final TextStyle textStyle;
   final TextStyle titleTextStyle;
+  final TextAlign textAlign;
+  final TextAlign titleTextAlign;
   final Color bgColor;
   final double sentenceSpacing;
   final double lineSpacing;
@@ -110,6 +112,8 @@ class ReadStyle {
   ReadStyle({
     required this.textStyle,
     required this.titleTextStyle,
+    required this.textAlign,
+    required this.titleTextAlign,
     required this.bgColor,
     required this.sentenceSpacing,
     required this.lineSpacing,
@@ -120,6 +124,8 @@ class ReadStyle {
   ReadStyle copyWith({
     TextStyle? textStyle,
     TextStyle? titleTextStyle,
+    TextAlign? textAlign,
+    TextAlign? titleTextAlign,
     Color? bgColor,
     double? sentenceSpacing,
     double? lineSpacing,
@@ -129,6 +135,8 @@ class ReadStyle {
     return ReadStyle(
         textStyle: textStyle ?? this.textStyle,
         titleTextStyle: titleTextStyle ?? this.titleTextStyle,
+        textAlign: textAlign ?? this.textAlign,
+        titleTextAlign: titleTextAlign ?? this.titleTextAlign,
         bgColor: bgColor ?? this.bgColor,
         sentenceSpacing: sentenceSpacing ?? this.sentenceSpacing,
         lineSpacing: lineSpacing ?? this.lineSpacing,

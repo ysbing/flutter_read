@@ -49,6 +49,8 @@ class ReadControllerImpl implements ReadController {
         color: Color(0xFF212832), fontSize: 20, fontWeight: FontWeight.w400),
     titleTextStyle: const TextStyle(
         color: Color(0xFF212832), fontSize: 26, fontWeight: FontWeight.w600),
+    textAlign: TextAlign.justify,
+    titleTextAlign: TextAlign.center,
     bgColor: const Color(0xFFF5F5DC),
     sentenceSpacing: 16,
     lineSpacing: 8,
