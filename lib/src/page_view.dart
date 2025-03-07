@@ -101,7 +101,13 @@ class _ReadPageViewState extends State<ReadPageView>
           if (notification is ScrollEndNotification) {
             int currentIndex = widget.pageController!.page?.round() ??
                 widget.pageController!.initialPage;
-            widget.onPageIndexChanged?.call(currentIndex);
+            widget.onPageIndexChanged?.call(currentIndex, pre: true);
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              if (widget.pageController?.position.activity
+                  is IdleScrollActivity) {
+                widget.onPageIndexChanged?.call(currentIndex);
+              }
+            });
           } else if (notification is ScrollStartNotification) {
             if (notification.dragDetails != null) {
               widget.onScrollCallback?.call();
@@ -401,7 +407,7 @@ class _FillViewportRenderObjectWidget extends SliverMultiBoxAdaptorWidget {
   });
 
   @override
-  _ReadRenderSliverFillViewport createRenderObject(BuildContext context) {
+  RenderSliverMultiBoxAdaptor createRenderObject(BuildContext context) {
     final SliverMultiBoxAdaptorElement element =
         context as SliverMultiBoxAdaptorElement;
     return _ReadRenderSliverFillViewport(childManager: element);
@@ -444,13 +450,11 @@ class _ReadRenderSliverFillViewport extends RenderSliverFixedExtentBoxAdaptor {
       }
     }
 
-    RenderBox? child = firstChild;
-    if (child != null) {
-      RenderBox? next = childAfter(child);
-      if (next != null) {
-        draw(next);
-      }
-      draw(child);
+    RenderBox child = firstChild!;
+    RenderBox? next = childAfter(child);
+    if (next != null) {
+      draw(next);
     }
+    draw(child);
   }
 }

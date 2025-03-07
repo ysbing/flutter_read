@@ -240,6 +240,8 @@ class ReadPagePosition extends ScrollPositionWithSingleContext
   }
 
   // 处理滑动边缘
+  int firstIndex = -1;
+  double minBeginPixels = -1;
   double beginPixels = 0;
   bool isLeft = false;
   bool isRight = false;
@@ -257,6 +259,9 @@ class ReadPagePosition extends ScrollPositionWithSingleContext
         !activity!.isScrolling &&
         hasPixels) {
       beginPixels = pixels;
+      if (beginPixels < minBeginPixels || minBeginPixels < 0) {
+        minBeginPixels = beginPixels;
+      }
       isLeft = false;
       isRight = false;
       isBreak = false;
@@ -278,8 +283,14 @@ class ReadPagePosition extends ScrollPositionWithSingleContext
           onEdgeCallback?.call(false);
         }
       }
-    } else if (delta > 0.0 && (isLeft || disableLeft)) {
-      setPixels(math.max(beginPixels, value));
+    } else if (delta > 0.0 &&
+        (isLeft || disableLeft || ((page ?? 0) < firstIndex))) {
+      if ((page ?? 0) < firstIndex) {
+        setPixels(minBeginPixels);
+        leftEdge = true;
+      } else {
+        setPixels(math.max(beginPixels, value));
+      }
       if (value < beginPixels && !leftEdge) {
         leftEdge = true;
         if (!isLeft && disableLeft) {
@@ -301,7 +312,9 @@ class ReadPagePosition extends ScrollPositionWithSingleContext
 
   @override
   void goBallistic(double velocity) {
-    if ((disableLeft && velocity < 0) || (disableRight && velocity > 0)) {
+    if (((page ?? 0) < firstIndex) ||
+        (disableLeft && velocity < 0) ||
+        (disableRight && velocity > 0)) {
       velocity = 0;
     }
     super.goBallistic(velocity);

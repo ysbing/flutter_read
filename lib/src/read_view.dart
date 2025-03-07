@@ -59,7 +59,7 @@ class _ReadViewState extends State<ReadView> {
     widget.readController.resetCallback = () {
       pageController.jumpToPage(pageController.initialPage);
     };
-    widget.readController.jumpToPageCallback = (int index) {
+    widget.readController.jumpToPageCallback = (int index, {bool pre = false}) {
       pageController.jumpToPage(index);
     };
     _onPageIndexChangedSubscription =
@@ -90,7 +90,7 @@ class _ReadViewState extends State<ReadView> {
       pageController.position.disableRight =
           widget.readController.disableRight.value;
     });
-    widget.readController.scrollToPageCallback = (int go) {
+    widget.readController.scrollToPageCallback = (int go, {bool pre = false}) {
       if (go < 0) {
         _previousPage(false);
       } else if (go > 0) {
@@ -282,40 +282,43 @@ class _ReadViewState extends State<ReadView> {
     }
   }
 
-  void _onPageIndexChanged(int index) {
+  void _onPageIndexChanged(int index, {bool pre = false}) {
     List<int> chapterIndexDiff = widget.readController.findChapterIndex(index);
     PaintData? data = widget.readController.bookPageList[chapterIndexDiff[0]]
         ?[chapterIndexDiff[1]];
     if (data == null) {
       return;
     }
-    int chapterIndex = data.chapterIndex;
-    int pageIndex = index - widget.readController.firstIndex;
-    int pageTotal = widget.readController.pageTotal();
-    if (data.bookPage == null) {
-      bool isSnapshot = data.widget == widget.readController.summaryWidget;
-      widget.readController.onPageIndexChangedController.add(
-        BookProgress(data.title, chapterIndex, pageIndex, pageTotal, 0, 0, 0,
-            null, !isSnapshot, isSnapshot),
-      );
-    } else {
-      BookLine bookLine = data.bookPage!.lines.first;
-      int sentenceIndex = bookLine.sentence.index;
-      int originalIndex = bookLine.sentence.originalIndex;
-      int wordIndex = bookLine.startIndex;
-      widget.readController.onPageIndexChangedController.add(
-        BookProgress(
-          data.title,
-          chapterIndex,
-          pageIndex,
-          pageTotal,
-          max(0, sentenceIndex),
-          max(0, originalIndex),
-          max(0, wordIndex),
-          data.bookPage,
-        ),
-      );
+    if (!pre) {
+      int chapterIndex = data.chapterIndex;
+      int pageIndex = index - widget.readController.firstIndex;
+      int pageTotal = widget.readController.pageTotal();
+      if (data.bookPage == null) {
+        bool isSnapshot = data.widget == widget.readController.summaryWidget;
+        widget.readController.onPageIndexChangedController.add(
+          BookProgress(data.title, chapterIndex, pageIndex, pageTotal, 0, 0, 0,
+              null, !isSnapshot, isSnapshot),
+        );
+      } else {
+        BookLine bookLine = data.bookPage!.lines.first;
+        int sentenceIndex = bookLine.sentence.index;
+        int originalIndex = bookLine.sentence.originalIndex;
+        int wordIndex = bookLine.startIndex;
+        widget.readController.onPageIndexChangedController.add(
+          BookProgress(
+            data.title,
+            chapterIndex,
+            pageIndex,
+            pageTotal,
+            max(0, sentenceIndex),
+            max(0, originalIndex),
+            max(0, wordIndex),
+            data.bookPage,
+          ),
+        );
+      }
     }
-    widget.readController.edge(index, data);
+    pageController.position.firstIndex = widget.readController.firstIndex;
+    widget.readController.edge(index, data, pre);
   }
 }

@@ -353,9 +353,11 @@ class ReadControllerImpl implements ReadController {
         ?.call(insertIndex + pageIndex + summaryIndex + interactionIndex);
   }
 
-  Future<void> edge(int index, PaintData bookData) async {
-    disableLeft.value = index <= firstIndex;
-    disableRight.value = index >= firstIndex + pageTotal() - 1;
+  Future<void> edge(int index, PaintData bookData, bool pre) async {
+    if (!pre) {
+      disableLeft.value = index <= firstIndex;
+      disableRight.value = index >= firstIndex + pageTotal() - 1;
+    }
     BookPage? bookPage = bookData.bookPage;
     List<PaintData> bookDataList = bookPageList[bookData.chapterIndex]!;
     if (bookPage?.isRepair ?? false) {

@@ -92,7 +92,7 @@ abstract class ReadController {
 }
 
 typedef EdgeCallback = Function(bool isLeft);
-typedef IndexCallback = void Function(int index);
+typedef IndexCallback = void Function(int index, {bool pre});
 typedef ReadDataListCallback = void Function(
     int chapterIndex, String title, List<PaintData> bookDataList);
 typedef ReadItemBuilder = Widget Function(

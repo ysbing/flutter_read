@@ -1,3 +1,7 @@
+## [1.0.6] - 2025.3.7
+
+* Optimize sliding.
+
 ## [1.0.5] - 2025.2.22
 
 * Optimize the Parsing of English Novels.
