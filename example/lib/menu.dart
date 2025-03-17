@@ -96,7 +96,7 @@ class _BookMenuState extends State<BookMenu> {
                         : Offset.zero,
                     duration: Duration(milliseconds: _animDuration),
                     child: SizedBox(
-                      height: !_wrapDirectoryHeight ? 400 : 0,
+                      height: !_wrapDirectoryHeight ? 360 : 0,
                       child: _buildDirectory(),
                     ),
                   ),
