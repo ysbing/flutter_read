@@ -108,17 +108,21 @@ class ReadStyle {
   final double lineSpacing;
   final double wordSpacing;
   final EdgeInsets padding;
+  final ScrollType scrollType;
 
   ReadStyle({
-    required this.textStyle,
-    required this.titleTextStyle,
-    required this.textAlign,
-    required this.titleTextAlign,
-    required this.bgColor,
-    required this.sentenceSpacing,
-    required this.lineSpacing,
-    required this.wordSpacing,
-    required this.padding,
+    this.textStyle = const TextStyle(
+        color: Color(0xFF212832), fontSize: 20, fontWeight: FontWeight.w400),
+    this.titleTextStyle = const TextStyle(
+        color: Color(0xFF212832), fontSize: 26, fontWeight: FontWeight.w600),
+    this.textAlign = TextAlign.justify,
+    this.titleTextAlign = TextAlign.center,
+    this.bgColor = const Color(0xFFF5F5DC),
+    this.sentenceSpacing = 16,
+    this.lineSpacing = 8,
+    this.wordSpacing = 2,
+    this.padding = const EdgeInsets.all(20),
+    this.scrollType = ScrollType.cover,
   });
 
   ReadStyle copyWith({
@@ -131,6 +135,7 @@ class ReadStyle {
     double? lineSpacing,
     double? wordSpacing,
     EdgeInsets? padding,
+    ScrollType? scrollType,
   }) {
     return ReadStyle(
         textStyle: textStyle ?? this.textStyle,
@@ -141,6 +146,23 @@ class ReadStyle {
         sentenceSpacing: sentenceSpacing ?? this.sentenceSpacing,
         lineSpacing: lineSpacing ?? this.lineSpacing,
         wordSpacing: wordSpacing ?? this.wordSpacing,
-        padding: padding ?? this.padding);
+        padding: padding ?? this.padding,
+        scrollType: scrollType ?? this.scrollType);
   }
+}
+
+/// scrolling type
+/// 滑动方式
+enum ScrollType {
+  /// Cover-style sliding
+  /// 覆盖滑动
+  cover,
+
+  /// 平滑滑动
+  /// Smooth scrolling
+  smooth,
+
+  /// 上下滑动
+  /// Vertical scrolling
+  vertical,
 }

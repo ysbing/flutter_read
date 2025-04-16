@@ -258,7 +258,8 @@ class ReadPagePosition extends ScrollPositionWithSingleContext
     if (newActivity is IdleScrollActivity &&
         !activity!.isScrolling &&
         hasPixels) {
-      beginPixels = pixels;
+      double pagePixels = getPixelsFromPage((page! - 0.5).roundToDouble());
+      beginPixels = pagePixels;
       if (beginPixels < minBeginPixels || minBeginPixels < 0) {
         minBeginPixels = beginPixels;
       }

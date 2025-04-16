@@ -1,19 +1,16 @@
-import 'dart:math' as math;
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
 import 'package:flutter/rendering.dart';
 
-import 'page_position.dart';
 import 'read_compat.dart';
 import 'read_controller.dart';
-import 'scroll_controller.dart';
+import 'read_page_position.dart';
+import 'read_scroll_controller.dart';
 
 class ReadPageView extends StatefulWidget {
   final ReadPageController? pageController;
   final NullableIndexedWidgetBuilder itemBuilder;
-  final EdgeCallback? onEdgeCallback;
+  final ScrollType scrollType;
   final VoidCallback? onScrollCallback;
   final IndexCallback? onPageIndexChanged;
   final GestureTapCallback? onVerticalDrag;
@@ -22,7 +19,7 @@ class ReadPageView extends StatefulWidget {
     super.key,
     this.pageController,
     required this.itemBuilder,
-    this.onEdgeCallback,
+    required this.scrollType,
     this.onScrollCallback,
     this.onPageIndexChanged,
     this.onVerticalDrag,
@@ -35,8 +32,7 @@ class ReadPageView extends StatefulWidget {
 class _ReadPageViewState extends State<ReadPageView>
     with TickerProviderStateMixin
     implements ScrollContext {
-  late final ScrollPhysics physics =
-      const _AvoidExcessiveInertiaPageScrollPhysics();
+  final ScrollPhysics physics = const ReadScrollPhysics();
   Map<Type, GestureRecognizerFactory> _gestureRecognizers =
       const <Type, GestureRecognizerFactory>{};
   final GlobalKey<RawGestureDetectorState> _gestureDetectorKey =
@@ -81,6 +77,7 @@ class _ReadPageViewState extends State<ReadPageView>
       offset: position,
       slivers: <Widget>[
         _FillViewportRenderObjectWidget(
+          scrollType: widget.scrollType,
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               return widget.itemBuilder(context, index);
@@ -103,8 +100,7 @@ class _ReadPageViewState extends State<ReadPageView>
                 widget.pageController!.initialPage;
             widget.onPageIndexChanged?.call(currentIndex, pre: true);
             WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-              if (widget.pageController?.position.activity
-                  is IdleScrollActivity) {
+              if (!position.isScrollingNotifier.value) {
                 widget.onPageIndexChanged?.call(currentIndex);
               }
             });
@@ -130,7 +126,7 @@ class _ReadPageViewState extends State<ReadPageView>
       context: this,
       initialPage: widget.pageController?.initialPage ?? 0,
       oldPosition: _position,
-      onEdgeCallback: widget.onEdgeCallback,
+      onEdgeCallback: widget.pageController?.onEdgeCallback,
     );
     widget.pageController?.attach(position);
   }
@@ -281,128 +277,13 @@ class _SingleTouchHorizontalDragGestureRecognizer
   }
 }
 
-// Avoid excessive inertia
-// 避免惯性过度
-class _AvoidExcessiveInertiaPageScrollPhysics extends PageScrollPhysics {
-  const _AvoidExcessiveInertiaPageScrollPhysics({super.parent});
-
-  static final SpringDescription _kDefaultSpring =
-      SpringDescription.withDampingRatio(
-    mass: 1,
-    stiffness: 60.0,
-    ratio: 1.3,
-  );
-
-  @override
-  _AvoidExcessiveInertiaPageScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return _AvoidExcessiveInertiaPageScrollPhysics(
-      parent: buildParent(ancestor),
-    );
-  }
-
-  @override
-  SpringDescription get spring => _kDefaultSpring;
-
-  @override
-  Simulation? createBallisticSimulation(
-      ScrollMetrics position, double velocity) {
-    if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
-        (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
-      return super.createBallisticSimulation(position, velocity);
-    }
-    final Tolerance tolerance = this.tolerance;
-    final double target = _getTargetPixels(position, tolerance, velocity);
-    if (target != position.pixels) {
-      return _SpringSimulation(spring, position.pixels, target, velocity,
-          tolerance: tolerance);
-    }
-    return null;
-  }
-
-  double _getTargetPixels(
-      ScrollMetrics position, Tolerance tolerance, double velocity) {
-    double page = position.pixels / position.viewportDimension;
-    bool isLeft = false, isRight = false;
-    ScrollDirection userScrollDirection = ScrollDirection.idle;
-    if (position is ReadPagePosition) {
-      userScrollDirection = position.userScrollDirection;
-      isLeft = position.isLeft;
-      isRight = position.isRight;
-    }
-    if (velocity < -tolerance.velocity &&
-        (userScrollDirection != ScrollDirection.reverse || !isLeft)) {
-      page -= 0.5;
-    } else if (velocity > tolerance.velocity &&
-        (userScrollDirection != ScrollDirection.forward)) {
-      page += 0.5;
-      if (isRight) {
-        page -= 1e-7;
-      }
-    }
-    return page.roundToDouble() * position.viewportDimension;
-  }
-}
-
-class _SpringSimulation extends Simulation {
-  _SpringSimulation(
-    SpringDescription spring,
-    double start,
-    double end,
-    double velocity, {
-    super.tolerance,
-  })  : _endPosition = end,
-        _solution = _CriticalSolution(spring, start - end, velocity);
-
-  final double _endPosition;
-  final _CriticalSolution _solution;
-
-  @override
-  double x(double time) =>
-      isDone(time) ? _endPosition : _endPosition + _solution.x(time);
-
-  @override
-  double dx(double time) => _solution.dx(time);
-
-  @override
-  bool isDone(double time) {
-    return nearZero(_solution.x(time), tolerance.distance) &&
-        nearZero(_solution.dx(time), tolerance.velocity);
-  }
-}
-
-class _CriticalSolution {
-  factory _CriticalSolution(
-    SpringDescription spring,
-    double distance,
-    double velocity,
-  ) {
-    final double r = -spring.damping / (2.0 * spring.mass);
-    final double c1 = distance;
-    final double c2 = velocity / (r * distance);
-    return _CriticalSolution.withArgs(r, c1, c2);
-  }
-
-  _CriticalSolution.withArgs(double r, double c1, double c2)
-      : _r = r,
-        _c1 = c1,
-        _c2 = c2;
-
-  final double _r, _c1, _c2;
-
-  double x(double time) {
-    return (_c1 + _c2 * time) * math.pow(math.e, _r * time);
-  }
-
-  double dx(double time) {
-    final double power = math.pow(math.e, _r * time) as double;
-    return _r * (_c1 + _c2 * time) * power + _c2 * power;
-  }
-}
-
 // Overlay swipe
 // 覆盖滑动
 class _FillViewportRenderObjectWidget extends SliverMultiBoxAdaptorWidget {
+  final ScrollType scrollType;
+
   const _FillViewportRenderObjectWidget({
+    required this.scrollType,
     required super.delegate,
   });
 
@@ -410,7 +291,11 @@ class _FillViewportRenderObjectWidget extends SliverMultiBoxAdaptorWidget {
   RenderSliverMultiBoxAdaptor createRenderObject(BuildContext context) {
     final SliverMultiBoxAdaptorElement element =
         context as SliverMultiBoxAdaptorElement;
-    return _ReadRenderSliverFillViewport(childManager: element);
+    if (scrollType == ScrollType.smooth) {
+      return RenderSliverFillViewport(childManager: element);
+    } else {
+      return _ReadRenderSliverFillViewport(childManager: element);
+    }
   }
 }
 

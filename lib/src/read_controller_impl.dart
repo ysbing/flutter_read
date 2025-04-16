@@ -44,19 +44,7 @@ class ReadControllerImpl implements ReadController {
 
   // English: Rendering style
   // 中文: 绘制样式
-  ReadStyle readStyle_ = ReadStyle(
-    textStyle: const TextStyle(
-        color: Color(0xFF212832), fontSize: 20, fontWeight: FontWeight.w400),
-    titleTextStyle: const TextStyle(
-        color: Color(0xFF212832), fontSize: 26, fontWeight: FontWeight.w600),
-    textAlign: TextAlign.justify,
-    titleTextAlign: TextAlign.center,
-    bgColor: const Color(0xFFF5F5DC),
-    sentenceSpacing: 16,
-    lineSpacing: 8,
-    wordSpacing: 2,
-    padding: const EdgeInsets.all(20),
-  );
+  ReadStyle _readStyle = ReadStyle();
 
   // English: Page index change notification
   // 中文: 页面下标改变通知
@@ -136,7 +124,7 @@ class ReadControllerImpl implements ReadController {
     ReadStyle? readStyle,
   }) {
     if (readStyle != null) {
-      readStyle_ = readStyle;
+      _readStyle = readStyle;
     }
     isAttach.addListener(() {
       if (isAttach.value) {
@@ -309,11 +297,11 @@ class ReadControllerImpl implements ReadController {
   BookProgress get currentProgress => currentProgress_;
 
   @override
-  ReadStyle get readStyle => readStyle_;
+  ReadStyle get readStyle => _readStyle;
 
   @override
   set readStyle(ReadStyle style) {
-    readStyle_ = style;
+    _readStyle = style;
     if (isAttach.value) {
       _initWord();
       refresh();
@@ -528,17 +516,17 @@ class ReadControllerImpl implements ReadController {
   }
 
   void _initWord() {
-    zhWordSize = _wordSize("龘", readStyle_.textStyle);
-    zhTitleWordSize = _wordSize("龘", readStyle_.titleTextStyle);
+    zhWordSize = _wordSize("龘", _readStyle.textStyle);
+    zhTitleWordSize = _wordSize("龘", _readStyle.titleTextStyle);
   }
 
   Size _wordSize(String word, TextStyle textStyle) {
     double contentWidth =
-        contentSize.width - readStyle_.padding.left - readStyle_.padding.right;
+        contentSize.width - _readStyle.padding.left - _readStyle.padding.right;
     TextPainter textPaint = _measureText(textStyle, word);
-    int maxLineWordNum = (contentWidth + readStyle_.wordSpacing) ~/
-        (textPaint.width + readStyle_.wordSpacing);
-    double wordWidth = (contentWidth + readStyle_.wordSpacing) / maxLineWordNum;
+    int maxLineWordNum = (contentWidth + _readStyle.wordSpacing) ~/
+        (textPaint.width + _readStyle.wordSpacing);
+    double wordWidth = (contentWidth + _readStyle.wordSpacing) / maxLineWordNum;
     return Size(wordWidth, textPaint.height);
   }
 

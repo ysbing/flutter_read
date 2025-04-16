@@ -4,13 +4,14 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_read/src/read_list_view.dart';
 
-import 'page_view.dart';
 import 'read_controller.dart';
 import 'read_controller_impl.dart';
 import 'read_data.dart';
+import 'read_page_view.dart';
 import 'read_painter.dart';
-import 'scroll_controller.dart';
+import 'read_scroll_controller.dart';
 
 class ReadView extends StatefulWidget {
   final ReadControllerImpl readController;
@@ -31,12 +32,14 @@ class ReadView extends StatefulWidget {
 }
 
 class _ReadViewState extends State<ReadView> {
-  late final ReadPageController pageController = ReadPageController(
+  late final ReadScrollController pageController = ReadScrollController.create(
+    scrollType: widget.readController.readStyle.scrollType,
     initialPage: ReadControllerImpl.initialPage,
     onAttachCallback: (position) {
       position.disableLeft = widget.readController.disableLeft.value;
       position.disableRight = widget.readController.disableRight.value;
     },
+    onEdgeCallback: widget.readController.onEdgeCallback_,
   );
   int? animPreviousPageIndex;
   int? animNextPageIndex;
@@ -130,17 +133,29 @@ class _ReadViewState extends State<ReadView> {
           widget.readController.contentSize = size;
         }
         widget.readController.isAttach.value = true;
-        Widget current = ReadPageView(
-          pageController: pageController,
-          itemBuilder: (BuildContext context, int index) {
-            return _contentWidget(index);
-          },
-          onEdgeCallback: widget.readController.onEdgeCallback_,
-          onScrollCallback: widget.onScroll,
-          onPageIndexChanged: _onPageIndexChanged,
-          onVerticalDrag:
-              widget.readController.enableVerticalDrag ? widget.onMenu : null,
-        );
+        Widget current;
+        if (widget.readController.readStyle.scrollType == ScrollType.vertical) {
+          current = ReadListView(
+            pageController: pageController as ReadListController,
+            itemBuilder: (BuildContext context, int index) {
+              return _contentWidget(index);
+            },
+            onScrollCallback: widget.onScroll,
+            onPageIndexChanged: _onPageIndexChanged,
+          );
+        } else {
+          current = ReadPageView(
+            pageController: pageController as ReadPageController,
+            itemBuilder: (BuildContext context, int index) {
+              return _contentWidget(index);
+            },
+            scrollType: widget.readController.readStyle.scrollType,
+            onScrollCallback: widget.onScroll,
+            onPageIndexChanged: _onPageIndexChanged,
+            onVerticalDrag:
+                widget.readController.enableVerticalDrag ? widget.onMenu : null,
+          );
+        }
         if (widget.readController.enableTapPage) {
           Offset tapPosition = Offset.zero;
           double tapWidth = size.width / 3;
@@ -209,14 +224,17 @@ class _ReadViewState extends State<ReadView> {
     }
     return Container(
       decoration: BoxDecoration(
-        color: widget.readController.readStyle_.bgColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: 0.2,
-            blurRadius: 10.0,
-          ),
-        ],
+        color: widget.readController.readStyle.bgColor,
+        boxShadow:
+            widget.readController.readStyle.scrollType == ScrollType.cover
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      spreadRadius: 0.2,
+                      blurRadius: 10.0,
+                    ),
+                  ]
+                : null,
       ),
       child: child,
     );
@@ -225,6 +243,14 @@ class _ReadViewState extends State<ReadView> {
   Future<void> _previousPage(bool notify) async {
     if (animNextPageIndex != null) {
       return;
+    }
+    if (animPreviousPageIndex != null &&
+        animPreviousPageIndex! <= widget.readController.firstIndex) {
+      if (pageController.page!.round() != animPreviousPageIndex) {
+        animPreviousPageIndex = null;
+      } else {
+        return;
+      }
     }
     if (widget.readController.disableLeft.value) {
       if (notify) {
@@ -255,6 +281,17 @@ class _ReadViewState extends State<ReadView> {
   Future<void> _nextPage(bool notify) async {
     if (animPreviousPageIndex != null) {
       return;
+    }
+    if (animNextPageIndex != null &&
+        animNextPageIndex! >=
+            widget.readController.firstIndex +
+                widget.readController.pageTotal() -
+                1) {
+      if (pageController.page!.round() != animNextPageIndex) {
+        animNextPageIndex = null;
+      } else {
+        return;
+      }
     }
     if (widget.readController.disableRight.value) {
       if (notify) {

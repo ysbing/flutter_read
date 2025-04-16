@@ -88,7 +88,7 @@ Future<List<PaintData>> addBookAfterData(ReadControllerImpl controller,
 Future<ui.Picture> drawTextOnCanvas(
     ReadControllerImpl controller, BookPage bookPage) async {
   final ui.PictureRecorder recorder = ui.PictureRecorder();
-  final ReadStyle readStyle = controller.readStyle_;
+  final ReadStyle readStyle = controller.readStyle;
   final Canvas canvas = Canvas(recorder);
 
   double x = readStyle.padding.left;
@@ -169,7 +169,7 @@ BookPage _getPageContentAfter(
   if (sentenceIndex >= sentences.length || sentenceIndex < 0) {
     return page;
   }
-  double height = controller.readStyle_.padding.top;
+  double height = controller.readStyle.padding.top;
   if (title.isNotEmpty) {
     List<BookWord> titleWord = List.empty(growable: true);
     for (int i = 0; i < title.length; i++) {
@@ -180,17 +180,17 @@ BookPage _getPageContentAfter(
         _getLineContentAfter(controller, titleSentence, 0, true);
     if (titleLines.isNotEmpty) {
       double titleWordHeight =
-          controller.zhTitleWordSize.height + controller.readStyle_.lineSpacing;
+          controller.zhTitleWordSize.height + controller.readStyle.lineSpacing;
       for (BookLine line in titleLines) {
         line.isTitle = true;
         page.lines.add(line);
         height += titleWordHeight;
         if (line.endIndex == null) {
-          height += controller.readStyle_.sentenceSpacing;
+          height += controller.readStyle.sentenceSpacing;
         }
         if (height +
                 controller.zhTitleWordSize.height +
-                controller.readStyle_.padding.bottom >=
+                controller.readStyle.padding.bottom >=
             viewHeight) {
           return page;
         }
@@ -200,10 +200,10 @@ BookPage _getPageContentAfter(
   int currentIndex = sentenceIndex;
   int startIndex = wordIndex;
   double wordHeight =
-      controller.zhWordSize.height + controller.readStyle_.lineSpacing;
+      controller.zhWordSize.height + controller.readStyle.lineSpacing;
   while (height +
               controller.zhWordSize.height +
-              controller.readStyle_.padding.bottom <
+              controller.readStyle.padding.bottom <
           viewHeight &&
       currentIndex < sentences.length) {
     BookSentence sentence = sentences[currentIndex];
@@ -214,11 +214,11 @@ BookPage _getPageContentAfter(
         page.lines.add(line);
         height += wordHeight;
         if (line.endIndex == null) {
-          height += controller.readStyle_.sentenceSpacing;
+          height += controller.readStyle.sentenceSpacing;
         }
         if (height +
                 controller.zhWordSize.height +
-                controller.readStyle_.padding.bottom >=
+                controller.readStyle.padding.bottom >=
             viewHeight) {
           return page;
         }
@@ -252,12 +252,12 @@ BookPage _getPageContentBefore(
   if (currentIndex >= sentences.length || currentIndex < 0) {
     return page;
   }
-  double height = controller.readStyle_.padding.top;
+  double height = controller.readStyle.padding.top;
   double wordHeight =
-      controller.zhWordSize.height + controller.readStyle_.lineSpacing;
+      controller.zhWordSize.height + controller.readStyle.lineSpacing;
   while (height +
               controller.zhWordSize.height +
-              controller.readStyle_.padding.bottom <
+              controller.readStyle.padding.bottom <
           viewHeight &&
       currentIndex >= 0) {
     BookSentence sentence = sentences[currentIndex];
@@ -279,13 +279,13 @@ BookPage _getPageContentBefore(
         }
         height += wordHeight;
         if (line.endIndex == null) {
-          height += controller.readStyle_.sentenceSpacing;
+          height += controller.readStyle.sentenceSpacing;
         }
         double lastLineHeight = controller.zhWordSize.height;
         if (lastLine != null && lastLine.endIndex == null) {
-          lastLineHeight += controller.readStyle_.sentenceSpacing;
+          lastLineHeight += controller.readStyle.sentenceSpacing;
         }
-        if (height + lastLineHeight + controller.readStyle_.padding.bottom >=
+        if (height + lastLineHeight + controller.readStyle.padding.bottom >=
             viewHeight) {
           return page;
         }
@@ -305,17 +305,17 @@ BookPage _getPageContentBefore(
         _getLineContentAfter(controller, titleSentence, 0, true);
     if (titleLines.isNotEmpty) {
       double titleWordHeight =
-          controller.zhTitleWordSize.height + controller.readStyle_.lineSpacing;
+          controller.zhTitleWordSize.height + controller.readStyle.lineSpacing;
       for (BookLine line in titleLines.reversed) {
         line.isTitle = true;
         page.lines.insert(0, line);
         height += titleWordHeight;
         if (line.endIndex == null) {
-          height += controller.readStyle_.sentenceSpacing;
+          height += controller.readStyle.sentenceSpacing;
         }
         while (height +
                 controller.zhTitleWordSize.height +
-                controller.readStyle_.padding.bottom >=
+                controller.readStyle.padding.bottom >=
             viewHeight) {
           BookLine lastLine = page.lines.last;
           if (lastLine.isTitle) {
@@ -323,7 +323,7 @@ BookPage _getPageContentBefore(
           }
           double lastLineHeight = wordHeight;
           if (lastLine.endIndex == null) {
-            lastLineHeight += controller.readStyle_.sentenceSpacing;
+            lastLineHeight += controller.readStyle.sentenceSpacing;
           }
           height -= lastLineHeight;
           page.lines.removeLast();
@@ -332,7 +332,7 @@ BookPage _getPageContentBefore(
     }
     if (height +
             controller.zhTitleWordSize.height +
-            controller.readStyle_.padding.bottom >=
+            controller.readStyle.padding.bottom >=
         viewHeight) {
       return page;
     }
@@ -348,7 +348,7 @@ BookPage _getPageContentBefore(
   }
   while (height +
               controller.zhWordSize.height +
-              controller.readStyle_.padding.bottom <
+              controller.readStyle.padding.bottom <
           viewHeight &&
       currentIndex < sentences.length) {
     BookSentence sentence = sentences[currentIndex];
@@ -360,11 +360,11 @@ BookPage _getPageContentBefore(
         page.isRepair = true;
         height += wordHeight;
         if (line.endIndex == null) {
-          height += controller.readStyle_.sentenceSpacing;
+          height += controller.readStyle.sentenceSpacing;
         }
         if (height +
                 controller.zhWordSize.height +
-                controller.readStyle_.padding.bottom >=
+                controller.readStyle.padding.bottom >=
             viewHeight) {
           return page;
         }
@@ -449,8 +449,8 @@ List<int> _breakText(
     return [0, 0];
   }
   double lineWidth = controller.contentSize.width -
-      controller.readStyle_.padding.left -
-      controller.readStyle_.padding.right;
+      controller.readStyle.padding.left -
+      controller.readStyle.padding.right;
   List<int> strBreak = List.filled(2, 0);
   double width = 0;
   for (int i = 0; i < text.length; i++) {
@@ -460,9 +460,9 @@ List<int> _breakText(
       paintWidth = _wordWidth(
               word,
               isTitle
-                  ? controller.readStyle_.titleTextStyle
-                  : controller.readStyle_.textStyle) +
-          controller.readStyle_.wordSpacing;
+                  ? controller.readStyle.titleTextStyle
+                  : controller.readStyle.textStyle) +
+          controller.readStyle.wordSpacing;
     } else {
       paintWidth = isTitle
           ? controller.zhTitleWordSize.width
@@ -470,7 +470,7 @@ List<int> _breakText(
     }
     double preWidth = width +
         paintWidth -
-        controller.readStyle_.wordSpacing +
+        controller.readStyle.wordSpacing +
         double.minPositive;
     if (preWidth > lineWidth) {
       if (_isHalf(word)) {
